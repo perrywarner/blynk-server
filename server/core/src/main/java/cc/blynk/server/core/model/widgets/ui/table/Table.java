@@ -31,6 +31,74 @@ public class Table extends OnePinWidget {
 
     @Override
     public void sendHardSync(ChannelHandlerContext ctx, int msgId, int deviceId) {
+    }{
+        if (isSame(deviceId, pin, type)) {
+            String[] values = value.split(BODY_SEPARATOR_STRING);
+            if (values.length > 0) {
+                String tableCommand = values[0];
+                switch (tableCommand) {
+                    case "clr" :
+                        rows.clear();
+                        currentRowIndex = 0;
+                        break;
+                    case "add" :
+                        if (values.length > 3) {
+                            int id = ParseUtil.parseInt(values[1]);
+                            String rowName = values[2];
+                            String rowValue = values[3];
+                            Row existingRow = get(id);
+                            if (existingRow == null) {
+                                rows.add(new Row(id, rowName, rowValue, true));
+                            } else {
+                                existingRow.update(rowName, rowValue);
+                            }
+                        }
+                        break;
+                    case "update" :
+                        if (values.length > 3) {
+                            int id = ParseUtil.parseInt(values[1]);
+                            String rowName = values[2];
+                            String rowValue = values[3];
+                            for (Row row : rows) {
+                                if (row.id == id) {
+                                    row.update(rowName, rowValue);
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case "pick" :
+                        if (values.length > 1) {
+                            currentRowIndex = Math.min(ParseUtil.parseInt(values[1]), rows.size() - 1);
+                        }
+                        break;
+                    case "select" :
+                        if (values.length > 1) {
+                            selectRow(values[1], true);
+                        }
+                        break;
+                    case "deselect" :
+                        if (values.length > 1) {
+                            selectRow(values[1], false);
+                        }
+                        break;
+                    case "order" :
+                        if (values.length > 2) {
+                            int oldIndex = ParseUtil.parseInt(values[1]);
+                            int newIndex = ParseUtil.parseInt(values[2]);
+                            try {
+                                rows.order(oldIndex, newIndex);
+                            } catch (Exception e) {
+                                //ignoring this error. as users may provide wrong indexes.
+                            }
+                        }
+                        break;
+                }
+                this.value = value;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

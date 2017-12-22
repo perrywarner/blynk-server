@@ -12,7 +12,9 @@ import java.util.LinkedList;
  */
 public class TableLimitedQueue<T> extends LinkedList<T> {
 
-    private static final int POOL_SIZE = Integer.parseInt(System.getProperty("table.rows.pool.size", "100"));
+    private static final int POOL_SIZE = Integer.parseInt(System.getProperty("table.rows.pool.size", "1000"));
+    //Increasing the size of the table queue to 1000 from 100 might mitigate the issue.
+    //I'd imagine the table Pool Size is limited arbitrarily for memory reasons
 
     private final int limit;
 
